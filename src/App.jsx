@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import Authentication from './Components/Authentication'
+import TaskCreator from './Components/TaskCreator'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(null)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/.auth/me') // <-- fixed
+        if (!res.ok) throw new Error('Failed to fetch user')
+        const data = await res.json()
+        setUser(data.clientPrincipal)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    fetchUser()
+  }, [])
+
+  if (user) {
+    return <div>
+      <TaskCreter/>
+    </div>
+  } else {
+    return <Authentication />
+  }
 }
 
 export default App
